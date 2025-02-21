@@ -1,0 +1,41 @@
+QLabel {
+  color: #03212e;
+  font-size: 18px;
+}
+
+QWindow {
+  background-color:rgb(255, 255, 255);
+}
+
+QWidget {
+  background-color:rgb(255, 255, 255);
+}
+
+QPushButton {
+  background-color: #3eab8f;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #2d6e71;
+  padding: 5px 15px;
+  margin-top: 10px;
+  outline: 0px;
+}
+
+QPushButton:focus {
+  background-color: #3eab8f;
+  border: 3px solid #2d6e71;
+}
+
+QMenu {
+  background-color:rgb(255, 255, 255);
+  border: 3px solid #03212e;
+}
+
+QMenu::item {
+  color: #03212e;
+}
+
+QMenu::item:selected {
+  background-color: #2d6e71;
+}
