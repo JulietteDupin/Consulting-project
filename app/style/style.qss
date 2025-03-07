@@ -1,5 +1,5 @@
 QLabel {
-  color: #03212e;
+  color: #59A5D8;
   font-size: 18px;
 }
 
@@ -12,30 +12,30 @@ QWidget {
 }
 
 QPushButton {
-  background-color: #3eab8f;
+  background-color: #84D2F6;
   color: #fff;
   font-weight: 600;
   border-radius: 8px;
-  border: 1px solid #2d6e71;
+  border: 1px solid #59A5D8;
   padding: 5px 15px;
   margin-top: 10px;
   outline: 0px;
 }
 
 QPushButton:focus {
-  background-color: #3eab8f;
-  border: 3px solid #2d6e71;
+  background-color: #84D2F6;
+  border: 3px solid #84D2F6;
 }
 
 QMenu {
   background-color:rgb(255, 255, 255);
-  border: 3px solid #03212e;
+  border: 3px solid #84D2F6;
 }
 
 QMenu::item {
-  color: #03212e;
+  color: #59A5D8;
 }
 
 QMenu::item:selected {
-  background-color: #2d6e71;
+  background-color: #231DC4;
 }

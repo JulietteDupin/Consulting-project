@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import os
-
+import json
 
 class UnrecognizedImagesManager(QMainWindow):
     def __init__(self, image_directory, parent=None):
@@ -105,28 +105,31 @@ class UnrecognizedImagesManager(QMainWindow):
             self.update_image_display()
 
     def save_annotation(self):
-        """Enregistre l'annotation pour l'image actuelle."""
+        """Enregistre l'annotation pour l'image actuelle dans le dossier <animal>_<mange ou non>."""
         if self.image_files:
             image_path = self.image_files[self.current_index]
             animal_type = self.type_selector.currentText()
             eating_status = self.eating_status_selector.currentText()
 
-            annotation = {
-                "image_path": image_path,
-                "animal_type": animal_type,
-                "eating_status": eating_status,
-            }
+            # Création du dossier avec la structure "<animal>_<mange ou non>"
+            folder_name = f"{'eating' if eating_status == 'Mange' else 'not_eating'}_{animal_type.lower()}"
+            folder_path = os.path.join(self.image_directory, folder_name)
 
-            # Enregistrer les annotations dans un fichier JSON
-            annotations_path = os.path.join(self.image_directory, "annotations.json")
-            if os.path.exists(annotations_path):
-                with open(annotations_path, "r") as file:
-                    data = json.load(file)
-            else:
-                data = []
+            # Crée le dossier s'il n'existe pas déjà
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
 
-            data.append(annotation)
-            with open(annotations_path, "w") as file:
-                json.dump(data, file, indent=4)
+            # Déplacer l'image vers le nouveau dossier
+            new_image_path = os.path.join(folder_path, os.path.basename(image_path))
+            os.rename(image_path, new_image_path)
 
-            self.image_label.setText("Annotation enregistrée avec succès.")
+            self.image_label.setText(f"Image enregistrée dans {folder_name}")
+
+            # Supprime l'image de la liste actuelle
+            self.image_files.pop(self.current_index)
+
+            # Affiche l'image suivante ou un message s'il n'y a plus d'images
+            if self.current_index >= len(self.image_files):
+                self.current_index = max(0, len(self.image_files) - 1)
+
+            self.update_image_display()

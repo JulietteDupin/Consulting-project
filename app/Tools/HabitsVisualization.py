@@ -3,7 +3,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import os
 import json
-
+import numpy as np
 
 class HabitsVisualization(QMainWindow):
     def __init__(self, habits_file="./datas/eating_habits.json"):
@@ -75,33 +75,44 @@ class HabitsVisualization(QMainWindow):
                     animals.add(animal)  # Ajouter l'animal à l'ensemble
         return sorted(list(animals))  # Retourner une liste triée d'animaux
 
+
     def plot_habits(self, selected_animal):
-        """Tracer les habitudes alimentaires sous forme de courbes pour un animal sélectionné."""
+        """Tracer les habitudes alimentaires sous forme de courbe moyenne par heure."""
         plt.clf()  # Effacer le graphique précédent
         fig, ax = plt.subplots(figsize=(10, 6))
-
-        # Préparer les données pour l'affichage
+    
+        # Dictionnaire pour stocker la somme et le nombre d'observations par heure
+        hourly_sums = {}
+        hourly_counts = {}
+    
+        # Parcourir toutes les données
         for day, hours in self.data.items():
-            # Trier les heures dans l'ordre croissant
-            sorted_hours = sorted(hours.items(), key=lambda x: int(x[0]) if x[0].isdigit() else int(x[0].split(":")[0]))
-
-            hours_list = []  # Liste des heures pour ce jour
-            meals_list = []  # Liste des repas pour ce jour
-
-            for hour, birds in sorted_hours:
-                # Calculer le nombre de repas pour l'animal sélectionné
-                meals = birds.get(selected_animal, 0)  # Nombre de repas pour l'animal
-                hours_list.append(int(hour))  # Ajouter l'heure convertie en entier
-                meals_list.append(meals)  # Ajouter le nombre de repas
-
-            # Tracer une ligne pour ce jour
-            ax.plot(hours_list, meals_list, marker='o', label=f"Jour {day}")
-
+            for hour, birds in hours.items():
+                hour_int = int(hour)  # Convertir en entier
+                meals = birds.get(selected_animal, 0)
+    
+                # Ajouter les repas à la somme et incrémenter le nombre d'observations
+                if hour_int not in hourly_sums:
+                    hourly_sums[hour_int] = 0
+                    hourly_counts[hour_int] = 0
+                hourly_sums[hour_int] += meals
+                hourly_counts[hour_int] += 1
+    
+        # Trier les heures pour éviter les allers-retours
+        hours_list = sorted(hourly_sums.keys())  # Liste des heures triées (ex: [1, 9, 10, 11, 14, 15, 20, 21, 22])
+        meal_averages = [hourly_sums[h] / hourly_counts[h] for h in hours_list]
+    
+        # Tracer la courbe moyenne
+        ax.plot(hours_list, meal_averages, marker='o', linestyle='-', color='b', label="Moyenne par heure")
+    
         # Définir les étiquettes et le titre
-        ax.set_title(f"Habitudes Alimentaires pour {selected_animal}")
-        ax.set_xlabel("Heures")
-        ax.set_ylabel("Nombre de repas")
-        ax.legend(title="Jours")  # Ajouter une légende avec un titre
+        ax.set_title(f"Moyenne des repas par heure - {selected_animal}")
+        ax.set_xlabel("Heure de la journée")
+        ax.set_ylabel("Nombre moyen de repas")
+        ax.set_xticks(np.arange(0, 24, 1))  # Afficher chaque heure sur l'axe X
+        ax.set_xlim(0, 23)  # Assurer une plage fixe de 0h à 23h pour éviter un mauvais affichage
+        ax.legend()
+    
         self.canvas.figure = fig  # Assigner la figure au canvas
         self.canvas.draw()
 

@@ -100,8 +100,10 @@ class EatingHabits:
         alert = False
         for animal, current_count in current_meals.items():
             if animal in average:  # Vérifie si l'animal a une moyenne calculée
-                if current_count < (average[animal] * 0.75):
-                    print(f"Alerte : consommation de {animal} en dessous de 75% de la moyenne.")
+                if current_count < (average[animal] * 0.90):
+                    print(f"Alerte : consommation de {animal} en dessous de 90% de la moyenne.")
                     alert = True
-    
+                if current_count > (average[animal] * 1.1):
+                    print(f"Alerte : consommation de {animal} en dessous de 110% de la moyenne.")
+                    alert = True
         return alert
