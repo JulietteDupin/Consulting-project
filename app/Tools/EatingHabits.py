@@ -79,6 +79,7 @@ class EatingHabits:
         Vérifie si le comportement alimentaire actuel (de minuit à l'heure actuelle) est significativement
         inférieur à la moyenne (moins de 75% de la moyenne).
         """
+        alert_for_animal = ""
         now = QDateTime.currentDateTime()
         current_hour = int(now.toString("h"))
         today = now.toString("yyyy-MM-dd")
@@ -103,7 +104,9 @@ class EatingHabits:
                 if current_count < (average[animal] * 0.90):
                     print(f"Alerte : consommation de {animal} en dessous de 90% de la moyenne.")
                     alert = True
+                    alert_for_animal = animal
                 if current_count > (average[animal] * 1.1):
                     print(f"Alerte : consommation de {animal} en dessous de 110% de la moyenne.")
                     alert = True
-        return alert
+                    alert_for_animal = animal
+        return alert, animal
