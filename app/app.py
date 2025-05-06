@@ -12,6 +12,7 @@ from Tools.VideoAnalyzer import VideoAnalyzer
 from Tools.HabitsVisualization import HabitsVisualization
 from Tools.UnrecognizedImagesManager import UnrecognizedImagesManager
 from Tools.LiveAnalyzer import LiveAnalyzer
+from Tools.DataManager import DataManager
 from pathlib import Path
 
 class AnimalEatingApp(QMainWindow):
@@ -92,6 +93,10 @@ class AnimalEatingApp(QMainWindow):
         manage_unrecognized_images_action.triggered.connect(self.show_unrecognized_images_page)
         self.menu.addAction(manage_unrecognized_images_action)
 
+        manage_data_action = QAction("Gestion des données", self)
+        manage_data_action.triggered.connect(self.show_data_management)
+        self.menu.addAction(manage_data_action)
+
     def start_live_analysis(self):
         self.live_analyzer_window = LiveAnalyzer(self.model, self.transform, self.habits, self)
         self.live_analyzer_window.show()
@@ -102,6 +107,10 @@ class AnimalEatingApp(QMainWindow):
 
     def show_unrecognized_images_page(self):
         self.unrecognized_images_manager.show()
+
+    def show_data_management(self):
+        self.data_management = DataManager("C:\\Users\\julie\\Documents\\Birdfeeder images and video clips\\app\\unrecognized_images\\", "./datas/eating_habits.json")
+        self.data_management.show()
 
 
 if __name__ == '__main__':
