@@ -80,14 +80,6 @@ class AnimalEatingApp(QMainWindow):
     def create_menu(self):
         self.menu = QMenu(self)
 
-        import_action = QAction("Importer une vidéo", self)
-        import_action.triggered.connect(self.import_video)
-        self.menu.addAction(import_action)
-
-        analyze_action = QAction("Analyser la vidéo", self)
-        analyze_action.triggered.connect(self.analyze_video)
-        self.menu.addAction(analyze_action)
-
         live_analyze_action = QAction("Analyser en direct", self)
         live_analyze_action.triggered.connect(self.start_live_analysis)
         self.menu.addAction(live_analyze_action)
@@ -99,25 +91,6 @@ class AnimalEatingApp(QMainWindow):
         manage_unrecognized_images_action = QAction("Images Non Reconnues", self)
         manage_unrecognized_images_action.triggered.connect(self.show_unrecognized_images_page)
         self.menu.addAction(manage_unrecognized_images_action)
-
-    def import_video(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Importer une vidéo", "", "Video Files (*.mp4 *.avi)")
-        if file_path:
-            self.label.setText(f"Vidéo importée : {file_path}")
-            self.video_path = file_path
-
-    def analyze_video(self):
-        if not self.video_path:
-            self.label.setText("Veuillez importer une vidéo d'abord.")
-            return
-
-        self.label.setText("Analyse en cours...")
-        self.analyzer_thread = VideoAnalyzer(self.video_path, self.model, self.transform, self.habits)
-        self.analyzer_thread.analysis_complete.connect(self.display_analysis_result)
-        self.analyzer_thread.start()
-
-    def display_analysis_result(self, eating_count):
-        self.label.setText(f"Analyse terminée. Animaux détectés mangeant : {eating_count} fois.")
 
     def start_live_analysis(self):
         self.live_analyzer_window = LiveAnalyzer(self.model, self.transform, self.habits, self)
