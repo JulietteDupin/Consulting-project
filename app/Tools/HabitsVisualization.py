@@ -14,7 +14,7 @@ class HabitsVisualization(QMainWindow):
         # Charger les données
         try:
             self.data = self.load_habits()
-            print(f"Données chargées : {self.data}")
+            #print(f"Données chargées : {self.data}")
         except Exception as e:
             print(f"Erreur : {e}")
             self.data = {}

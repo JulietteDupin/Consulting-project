@@ -19,6 +19,9 @@ class LiveAnalyzer(QMainWindow):
         self.timer = QTimer(self)
         self.running = False
 
+        self.detected_animal = None
+        self.last_detected_animal_animal_change = None
+
         # Stocke les alertes ignorées pour chaque oiseau
         self.suppressed_alerts = {}
 
@@ -71,7 +74,7 @@ class LiveAnalyzer(QMainWindow):
 
     def start_analyzer(self):
         """Démarre l'analyse vidéo."""
-        self.cap = cv2.VideoCapture("../consulting project vidéo birds.mp4")
+        self.cap = cv2.VideoCapture("../consulting project vidéo birds vitesse normale.mp4") # remplacer par cv2.VideoCapture(0) pour utiliser la caméra
         if not self.cap.isOpened():
             print("Impossible d'accéder à la caméra.")
             return
@@ -95,16 +98,23 @@ class LiveAnalyzer(QMainWindow):
             softmax_probs = torch.nn.functional.softmax(output, dim=1)
             confidence, predicted = torch.max(softmax_probs, 1)
 
-        result_text = self.class_name[predicted.item()]
-        confidence_value = confidence.item()
+        current_time = QDateTime.currentDateTime()
+        if self.detected_animal == None:
+            self.detected_animal = predicted.item()
+            self.last_detected_animal_change = QDateTime.currentDateTime()
+        elif self.detected_animal != predicted.item() and self.last_detected_animal_change.msecsTo(current_time) >= 1000: # 500ms = 0.5s
+            self.detected_animal = predicted.item()
+            self.last_detected_animal_change = QDateTime.currentDateTime()   
+            
+        detected_animal_name = self.class_name[self.detected_animal] 
 
-        if predicted.item() < 4:  # Oiseau en train de manger
+        if self.detected_animal < 4:  # Oiseau en train de manger
             current_time = QDateTime.currentDateTime()
-            last_time = self.last_eating_time[result_text]
+            last_time = self.last_eating_time[detected_animal_name]
 
-            if last_time is None or last_time.msecsTo(current_time) >= 60000:
-                self.eating_counts[result_text] += 1
-                self.last_eating_time[result_text] = current_time
+            if last_time is None or last_time.msecsTo(current_time) >= 2000: # 2000ms = 2s
+                self.eating_counts[detected_animal_name] += 1
+            self.last_eating_time[detected_animal_name] = current_time
 
         today = QDateTime.currentDateTime().toString("yyyy-MM-dd")
         self.habits.record_eating(today, QDateTime.currentDateTime().toString("h"), self.eating_counts)
@@ -112,12 +122,15 @@ class LiveAnalyzer(QMainWindow):
         # Vérification des alertes
         alert, animal = self.habits.check_for_change()
         if alert:
-            self.show_alert_popup(f"⚠️ Alerte : {animal} mange moins souvent que d'habitude !", animal)
+            self.show_alert_popup(f"⚠️ Alerte : {animal} mange moins souvent que d'habitude.", animal)
 
         # Affichage
         frame_qt = QImage(frame_rgb.data, frame_rgb.shape[1], frame_rgb.shape[0], QImage.Format_RGB888)
-        self.update_frame_from_camera(frame_qt, f"{result_text} ({confidence_value:.2f})")
-
+        if self.detected_animal < 4:  # Oiseau en train de manger
+            self.update_frame_from_camera(frame_qt, f"{detected_animal_name} nombre de repas enregistrés aujourd'hui : {self.eating_counts[detected_animal_name]}")
+        else :
+            self.update_frame_from_camera(frame_qt, f"{detected_animal_name}")  
+          
     def update_frame_from_camera(self, frame_qt, result_text):
         """Met à jour l'affichage."""
         if frame_qt.isNull():

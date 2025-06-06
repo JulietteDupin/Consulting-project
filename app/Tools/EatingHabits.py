@@ -29,7 +29,7 @@ class EatingHabits:
         try:
             with open(self.file_path, "w") as f:
                 json.dump(self.habits, f)
-            print("Les habitudes alimentaires ont été sauvegardées avec succès.")
+            #print("Les habitudes alimentaires ont été sauvegardées avec succès.")
         except Exception as e:
             print(f"Une erreur inattendue est survenue : {str(e)}.")
 
@@ -86,7 +86,7 @@ class EatingHabits:
     
         # Calcule la moyenne historique
         average = self.get_average()  # Dictionnaire avec les moyennes par animal
-        print("Average consumption:", average)
+        #print("Average consumption:", average)
     
         # Calcule les repas actuels de minuit à l'heure actuelle
         current_meals = {}
@@ -101,12 +101,12 @@ class EatingHabits:
         alert = False
         for animal, current_count in current_meals.items():
             if animal in average:  # Vérifie si l'animal a une moyenne calculée
-                if current_count < (average[animal] * 0.90):
-                    print(f"Alerte : consommation de {animal} en dessous de 90% de la moyenne.")
+                if current_count < (average[animal] * 0.80):
+                    #print(f"Alerte : consommation de {animal} en dessous de 90% de la moyenne.")
                     alert = True
                     alert_for_animal = animal
-                if current_count > (average[animal] * 1.1):
-                    print(f"Alerte : consommation de {animal} en dessous de 110% de la moyenne.")
+                if current_count > (average[animal] * 1.2):
+                    #print(f"Alerte : consommation de {animal} au dessus de 110% de la moyenne.")
                     alert = True
                     alert_for_animal = animal
         return alert, animal
